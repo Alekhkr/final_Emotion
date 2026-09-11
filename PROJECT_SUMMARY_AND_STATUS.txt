@@ -1,0 +1,39 @@
+================================================================================
+NATIONAL HELPLINE AGAINST ATROCITIES (14566) - MULTIMODAL AI TRIAGE PLATFORM
+PROJECT SUMMARY & STATUS REPORT
+================================================================================
+
+1. WHAT THE PROJECT DOES
+--------------------------------------------------------------------------------
+This project is an advanced, multi-modal AI stress and trauma triage engine designed for the National Helpline Against Atrocities (14566), targeting SC/ST victims of caste atrocities, social boycotts, and violence. It replaces traditional, subjective keyword-based call handling with objective biomarker analysis and generative AI reasoning.
+
+Key capabilities include:
+- Audio Ingestion & Normalization: Accepts audio streams and files (WAV, MP3, WebM) and normalizes them for processing.
+- Acoustic Prosody & Biomarkers: Uses Librosa and SciPy to detect involuntary vocal micro-tremors (Jitter, Shimmer, Pitch variations) indicative of panic or distress.
+- Speech Emotion Recognition (SER): Utilizes `emotion2vec+ Large` to extract non-verbal emotion features (distress, fear, anger) directly from the raw audio waveform.
+- Multilingual STT & Translation: Employs the Sarvam Saaras STT API to transcribe regional dialects and code-mixed speech (e.g., Hinglish) accurately, alongside an Indic neural translation engine to provide parallel English transcripts.
+- Non-Deterministic Contextual Reasoning: Uses a local open-source Indic LLM (like Qwen2.5-Instruct or Llama-3.1-8B-Instruct) to perform zero-shot forensic legal reasoning. This approach understands the context of indirect threats (like social boycotts) without relying on brittle keyword matching.
+- Stress Vulnerability Index (SVI): Computes a composite risk score (0-100) by fusing cognitive contextual reasoning (70% weight) with acoustic/vocal distress metrics (30% weight).
+- Generative Statutory SOPs: Automatically recommends multi-tiered legal interventions (e.g., immediate police protection under Section 15A of the SC/ST Act, NALSA advocate assignment) based on the specific context of the grievance.
+- Real-Time Multi-Device Sync: Features a FastAPI backend with SQLite persistence and WebSocket broadcasting, updating a React/TypeScript frontend (Triage Console) in real-time for all connected officers.
+
+
+2. WHAT IS MISSING OR NEEDS IMPROVEMENT
+--------------------------------------------------------------------------------
+Based on a review of the project files, roadmap, and current state, the following items are missing, incomplete, or require attention:
+
+A. Frontend TypeScript Errors:
+   The React frontend (`new-frontend`) is currently failing to compile due to several TypeScript errors. 
+   - There are widespread issues related to `verbatimModuleSyntax`. Imports of types/interfaces are not using the required `import type` syntax (e.g., `import type { Operator } from ...`).
+   - Several unused variable warnings/errors exist across multiple components (e.g., `AudioPlayer.tsx`, `HumanReview.tsx`, `SpeechAnalysis.tsx`).
+   - These errors must be resolved for the frontend to build successfully.
+
+B. True Real-Time Streaming (Phase 3 Roadmap):
+   - Current implementation appears to process audio in a chunked or batch file mode (e.g., via the `/analyze` endpoint uploading a file).
+   - The roadmap specifies the need for a WebRTC continuous sliding-window streaming architecture. This would allow for live call audio transcription and acoustic stress meter visualization updating every 500 milliseconds on the operator's screen while the caller is still speaking.
+
+C. Transition to Fully Non-Deterministic AI (Phase 2):
+   - The codebase contains both `muril_analyzer.py` (legacy keyword/deterministic approach) and `llm_reasoner.py` (generative approach). While the non-deterministic reasoning is outlined and implemented, ensuring complete integration, load balancing on the local GPU, and phasing out of legacy keyword constraints might require further refinement and testing.
+
+D. Deployment & Model Serving Pipeline:
+   - Hosting a local quantized LLM alongside `emotion2vec+` and STT engines on a single GPU (like a Tesla T4) as proposed requires precise VRAM management. A production-ready orchestration script (using vLLM or similar optimized serving engines) beyond the basic FastAPI `app.py` might be needed for high-concurrency environments.
